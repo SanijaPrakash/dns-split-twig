@@ -1,0 +1,428 @@
+{% extends "main.html.twig" %}
+{% set selectedPrivacy = false %}
+{% set selectedNotification = false %}
+{% if privacy == true %}
+    {% set selectedPrivacy = true %}
+{% endif %}
+{% if notification == 1 %}
+    {% set selectedNotification = true %}
+{% endif %}
+{% block body %}
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12 pt-5">
+                <div class="modal-header pl-0 border-0">
+                    <h5 class="modal-title pro-display-bold line-height-1">Details of -
+                        <span id="grpName">{{grpName}}</span>
+                        <br/>
+                        <span class="font-12 date-time pro-display-regular" id="editDateCreated">Created :
+                            {{datecreated|date('d M y')}},
+                            <span>{{datecreated|date('g:i A')}}
+                            </span>
+                        </span>
+                    </h5>
+                    <div id="recordCount">Success Records :
+                        <span id="success" style="color:green">{{ success }}</span>
+                        and Failed Records :
+                        <span id="failure" style="color:red">{{ faliure }}
+                        </span>
+                    </div>
+                </div>
+                <div class="alert alert-dismissible alert-danger alert-notify animated fadeInDown" id="message" style="display: none !important;">
+                    <span style="color:black"></span>
+                </div>
+                <div class="row m-0">
+                    <div class="col-3 pl-0">
+                        <label class="check-div mr-4" style="line-height: 2.5px;">
+                            <input id="privacyCheckbox" onchange="changeCheckBox()" type="checkbox" {% if selectedPrivacy %} checked {% endif %}>
+                            <input type="hidden" value="1">
+                            <span class="check-m"></span>
+                            <span class="font-12">Make Public visible</span>
+                        </label>
+                    </div>
+                    <div class="col-8">
+                        <label class="check-div mr-4" style="line-height: 2.5px;">
+                            <input id="notificationCheckBox" onchange="changeCheckBox()" type="checkbox" {% if selectedNotification %} checked {% endif %}>
+                            <input type="hidden" value="1">
+                            <span class="check-m"></span>
+                            <span class="font-12">Enable Notification</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="modal-body pl-0 pt-0 modal-scroll">
+                    <div id='recordDiv'>
+                        {{ template|raw }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block javascript %}
+    {{ parent() }}
+    <script>
+        var recordType = '';
+        var deleteCounter = {
+            'A': 0,
+            'TXT': 0,
+            'MX': 0,
+            'CNAME': 0,
+            'PTR': 0
+        };
+        var dnsGrpId = '{{dnsGroupId}}';
+        var privacy = "{{selectedPrivacy ? 'true' : 'false'}}";
+        var notification = "{{selectedNotification ? 'true' : 'false'}}";
+        function addNew(param, tableName, verify) {
+            var html = '';
+            var addNewBtn = document.getElementById(tableName + '_new');
+            var save = document.getElementById(tableName + '_save');
+            if ((param == 'formEditCname') || (param == 'formEditMX')) {
+                html += editMxCname({
+                    id: '',
+                    name: '',
+                    value: '',
+                    ttl: '',
+                    dnsGroupId: dnsGrpId
+                }, '', tableName, verify);
+                if (param == 'formEditCname') {
+                    $('#CNAMERecordEditTable').append(html);
+                } else {
+                    $('#MXRecordEditTable').append(html);
+                }
+            } else {
+                html += editHtml({
+                    id: '',
+                    name: '',
+                    value: '',
+                    dnsGroupId: dnsGrpId
+                }, '', tableName, verify);
+                if (param == 'formEditA') {
+                    $('#ARecordEditTable').append(html);
+                }
+                if (param == 'formEditTXT') {
+                    $('#TXTRecordEditTable').append(html);
+                }
+                if (param == 'formEditPTR') {
+                    $('#PTRRecordEditTable').append(html);
+                }
+            }
+            if (save) {
+                addNewBtn.style.display = "none";
+                save.style.display = "block";
+            }
+        }
+
+        function editMxCname(data, id, tblName, verify) {
+            var edit = 'edit';
+            var verified = '';
+            if (verify == 'false') {
+                verified = ' <span id="ban" style="color:red" class="label left_pad_lbl red-label border-0 white-co ml-3"><i class="fas fa-ban"></i></span> ';
+            } else {
+                verified = ' <span id="check' + data['type'] + data['id'] + '" class="label left_pad_lbl ' + (
+                (data['result'] == 2 || data['result'] == '') ? 'red-label' : 'green-label'
+            ) + ' border-0 white-co ml-3"><i class="fas fa-' + (
+                (data['result'] == 2 || data['result'] == '') ? 'ban' : 'check'
+            ) + '"></i></span>';
+            }
+
+            var html = ' <tr id=' + tblName + '' + data['id'] + '>  <td>  <a class="float-right red-close" href="javascript:void(0)" onclick=closeButton(\'' + tblName + '\')> <i class="far fa-window-close"></i>  </a>  <input id= ' + (
+            id ? (id + 'DnsGroupId') : tblName + 'DnsGroupId'
+        ) + ' type="hidden" value=' + data['dnsGroupId'] + '>   </td> <td><input required type="text" id= ' + (
+            id ? (id + 'Name') : tblName + 'Name'
+        ) + ' class="form-control" placeholder="" value=\'' + data['name'] + '\'></td> <td><input required type="text"  id=' + (
+            id ? (id + 'ttl') : tblName + 'ttl'
+        ) + ' class="form-control" placeholder=".." value=' + data['ttl'] + '></td> <td class="br-0 left-pad-wth">' + verified + '<input   required id=' + (
+            id ? (id + 'Value') : tblName + 'Value'
+        ) + ' type="text" class="form-control" placeholder=".." value=\'' + data['value'] + '\'> </td> <td><div class="dropdown"> <button class="btn action-btn dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> Actions </button> <div class="dropdown-menu action-drop p-0" aria-labelledby="dropdownMenuButton"> <a class="dropdown-item" href="#"  > <i class="fas fa-sync-alt pr-2"></i></i> Recheck </a>  <a class="dropdown-item" href="#" > <i class="fas fa-history pr-2"></i> History </a> <a class="dropdown-item border-0" href="#"  > <i class="fas fa-trash-alt pr-2"></i> Delete</a> </div> </div></td> </tr> ';
+
+            return html;
+        }
+
+        function editHtml(data, id, tblName, verify) {
+            console.log(tblName)
+            var edit = 'edit';
+            var verified = '';
+            if (verify == 'false') {
+                verified = '<span id="ban" style="color:red" class="label left_pad_lbl red-label border-0 white-co ml-3"><i class="fas fa-ban"></i></span>';
+            } else {
+                verified = ' <span id="check' + data['type'] + data['id'] + '" class="label left_pad_lbl ' + (
+                (data['result'] == 2 || data['result'] == '') ? 'red-label' : 'green-label'
+            ) + ' border-0 white-co ml-3"><i class="fas fa-' + (
+                (data['result'] == 2 || data['result'] == '') ? 'ban' : 'check'
+            ) + '"></i></span>';
+            }
+            var html = '  <tr id=' + tblName + '' + data['id'] + '> <td>  <a class="float-right red-close" href="javascript:void(0)" onclick=closeButton(\'' + tblName + '\')> <i class="far fa-window-close"></i>  </a> <input id=' + (
+            id ? (id + 'DnsGroupId') : tblName + 'DnsGroupId'
+        ) + ' type="hidden" value=' + data['dnsGroupId'] + '> </td>  <td class="add-name"><input id=' + (
+            id ? (id + 'Name') : tblName + 'Name'
+        ) + ' class="form-control" placeholder=".." type="text" value=' + data['name'] + '></td> <td class="br-0 left-pad-wth"> ' + verified + '<input id=' + (
+            id ? (id + 'Value') : tblName + 'Value'
+        ) + ' class="form-control" placeholder=".." type="text" value=\'' + data['value'] + '\'></td> <td><div class="dropdown"> <button aria-expanded="false" aria-haspopup="true" class="btn action-btn dropdown-toggle" data-toggle="dropdown" id="dropdownMenuButton" type="button">Actions </button> <div aria-labelledby="dropdownMenuButton" class="dropdown-menu action-drop p-0"> <a class="dropdown-item" href="#"  ><i class="fas fa-sync-alt pr-2"></i> </i> Recheck </a>  <a class="dropdown-item" href="#" ><i class="fas fa-history pr-2"></i> History</a> <a class="dropdown-item border-0" href="#"  >  <i class="fas fa-trash-alt pr-2"></i> Delete</a></div></div> </td> </tr> ';
+
+            return html;
+        }
+        function closeButton(tableName) {
+            var addNewBtn = document.getElementById(tableName + '_new');
+            var save = document.getElementById(tableName + '_save');
+            addNewBtn.style.display = "block";
+            save.style.display = "none";
+            document.getElementById(tableName).remove();
+        }
+        function saveNew(tableName) {
+            var addNewBtn = document.getElementById(tableName + '_new');
+            var save = document.getElementById(tableName + '_save');
+            var name = document.getElementById(tableName + 'Name').value;
+            var value = document.getElementById(tableName + 'Value').value;
+            var data = {};
+
+            if ((tableName == 'CNAME') || (tableName == 'MX')) {
+                var ttl = document.getElementById(tableName + 'ttl').value;
+                if ((name != '') && (value != '') && (ttl != '')) {
+                    data = {
+                        name: name,
+                        value: value,
+                        ttl: ttl,
+                        type: tableName,
+                        dnsGroupId: dnsGrpId
+                    };
+                } else {
+                    console.log('Fill in the empty feilds');
+                    return;
+                }
+            } else {
+                if ((name != '') && (value != '')) {
+                    ttl = 1;
+                    console.log(name)
+                    console.log(value)
+                    data = {
+                        name: name,
+                        value: value,
+                        ttl: ttl,
+                        type: tableName,
+                        dnsGroupId: dnsGrpId
+                    };
+                } else {
+                    console.log('Fill in all the feilds');
+                    return;
+                }
+
+            }
+            $.ajax({type: "POST", url: "{{ path('insertRecord')}}", data: data, dataType: 'json'})
+            .done(function (response) {
+                console.log(response);
+                var msg = document.getElementById('message');
+                msg.style.display = "block";
+                msg.style.color = '#ffffff';
+                var alert = $('#message')
+                alert.removeClass("alert-danger alert-info alert-success");
+                document.getElementById("recordDiv").innerHTML = response['dnsRecord'];
+                if (response['status'] == 'Success') {
+                    alert.addClass("alert-success");
+                    $('#message').text(tableName + ' Record Insertion success');  
+                } else {
+                    alert.addClass("alert-danger");
+                    $('#message').text(tableName + ' Record Duplicate : Record Insertion Failed ');  
+                }
+                var failureCount = parseInt($('#failure').text().trim());
+                $('#failure').text(++failureCount)
+            }).fail(function (error) {
+                console.log(error);
+            })
+            if (save) {
+                addNewBtn.style.display = "block";
+                save.style.display = "none";
+            }
+        }
+
+        function recordChanged(event, id, type) {
+
+            var value = event.target.value;
+            $.ajax({
+                type: "POST",
+                url: "{{ path('recordChanged') }}",
+                data: {
+                    id: id,
+                    value: value,
+                    type: type
+                },
+                dataType: 'json'
+            }).done(function (response) {
+                console.log(response);
+            }).fail(function () {
+                console.log("error");
+            })
+        }
+
+        function changeCheckBox() {
+            if (document.getElementById('privacyCheckbox').checked) {
+                privacy = true;
+            } else {
+                privacy = false;
+            }
+            if (document.getElementById('notificationCheckBox').checked) {
+                notification = true;
+            } else {
+                notification = false;
+            }
+            $.ajax({
+                type: "POST",
+                url: "{{ path('updateprivacyemail') }}",
+                data: {
+                    id: dnsGrpId,
+                    privacy: privacy,
+                    notification: notification
+                },
+                dataType: 'json'
+            }).done(function (response) {
+                console.log(response);
+            }).fail(function () {
+                console.log("error");
+            })
+        }
+
+        function deleteRecord(id, type) {
+            console.log(type);
+            $.ajax({
+                type: "POST",
+                url: "{{ path('deleteRecord') }}",
+                data: {
+                    id: id,
+                    dnsGrpId: dnsGrpId
+                },
+                dataType: 'json'
+            }).done(function (response) {
+                console.log(response);
+                if (response['status'] == 'success') {
+                    document.getElementById(type + "" + id).remove();
+                    $('#success').text(response['successCount']);
+                    $('#failure').text(response['failureCount']);
+                }
+            }).fail(function () {
+                console.log("error");
+            })
+        }
+
+        function deleteRecordEntry(event, tableName) {
+            recordType = tableName;
+            if (event.target.checked) {
+                deleteCounter[tableName] += 1;
+            } else {
+                deleteCounter[tableName] -= 1;
+            }
+            var addNewBtn = document.getElementById(tableName + '_new');
+            var x = document.getElementById(tableName + '_delete');
+            var save = document.getElementById(tableName + '_save');
+            if (deleteCounter[tableName] > 0) {
+                if (x) {
+                    addNewBtn.style.display = "none";
+                    x.style.display = "block";
+                    save.style.display = "none";
+                }
+            } else {
+                if (x) {
+                    addNewBtn.style.display = "block";
+                    x.style.display = "none";
+                }
+            }
+        }
+
+        function deleteChecked(param) {
+            var id = [];
+            $('#' + param + ' input[type=checkbox]').each(function () {
+                if ($(this).is(":checked")) {
+                    id.push($(this).val());
+                }
+            });
+            if (id.length > 0) {
+                $.ajax({
+                    url: "{{path('deleteMultipleRecord')}}",
+                    type: 'POST',
+                    data: {
+                        id: id,
+                        dnsGrpId: dnsGrpId
+                    },
+                    success: function (response) {
+                        $.each(id, function (i, l) {
+                            var addNewBtn = document.getElementById(recordType + '_new');
+                            var x = document.getElementById(recordType + '_delete');
+                            document.getElementById(recordType + "" + l).remove();
+                            addNewBtn.style.display = "block";
+                            x.style.display = "none";
+                            $('#success').text(response['successCount']);
+                            $('#failure').text(response['failureCount']);
+                        });
+                    }
+                });
+            }
+        }
+
+        function recheckRecord(id, type, from) {
+            console.log(id)
+            console.log(type)
+            console.log(from)
+            var verified = '';
+            $.ajax({
+                type: "POST",
+                url: "{{ path('recheckRecord') }}",
+                data: {
+                    id: id,
+                    type: type,
+                    dnsGrpId: dnsGrpId,
+                    notification: notification
+                },
+                dataType: 'json'
+            }).done(function (response) {
+                console.log(response);
+                var ele = $('#check' + type + id)
+                ele.removeClass("green-label red-label");
+                if (response.check) {
+                    ele.addClass("green-label");
+                    ele.css('color', 'green');
+                    ele.html('<i class="fas fa-check"></i>');
+
+                } else {
+                    ele.addClass("red-label");
+                    ele.css('color', 'red');
+                    ele.html('<i class="fas fa-ban"></i>');
+                }
+                var msg = document.getElementById('message');
+                msg.style.fontWeight = "900";
+                var alert = $('#message')
+                alert.removeClass("alert-danger alert-info alert-success");
+                if (response['status'] == 'verified') {
+                    msg.style.display = "block";
+                    alert.addClass("alert-success");
+                    msg.style.display = "block";
+                    msg.style.color = '#ffffff';
+       
+                    if (response['email'] == 'sent') {
+                        $('#message').text(type + ' Record check Success  :  Record Match and Email sent successfully');
+                    } else {
+                        $('#message').text(type + ' Record check Success  :  Record Match');
+                    }
+
+                } else if (response['status'] == 'not verified') {
+                    msg.style.display = "block";
+                    alert.addClass("alert-info");
+                    $('#message').text(type + ' Record check Success  :  Record Mismatch');
+                    msg.style.color = '#ffffff'; 
+                } else {
+                    msg.style.display = "block";
+                    alert.addClass("alert-danger");
+                    $('#message').text(type + ' Record check Failed');
+                    msg.style.color = '#ffffff'; 
+                }
+                $('#success').text(response['successCount']);
+                $('#failure').text(response['failureCount']);
+            }).fail(function (error) {
+                console.log(error);
+            })
+
+        }
+        $(document).ready(function () {
+            $("#messageedit").hide();
+            $("#emailedit").hide();
+
+        });
+    </script>
+{% endblock %}

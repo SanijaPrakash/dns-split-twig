@@ -1,0 +1,49 @@
+{% extends "main.html.twig" %}
+{% block body %}
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12 pt-5">
+                <div class="modal-header pl-0 border-0">
+                {% set rec = history[0] %}
+                    <h5 class="modal-title pro-display-bold line-height-1">
+                        History of {{rec.name}}
+                        <span id="historyrecord"> </span><br/>
+                    </h5>    
+                </div>
+                <div class="modal-body pl-0 pt-0 modal-scroll">
+                    <div class="row pb-3">
+                        <div class="col-md-12">
+                            <div class="pt-2 section1">
+                                <form id="historyForm" method="post" name="historyForm">
+                                    <table cellpadding="0" class="table history-dns-table mb-2" width="100%">
+                                        <thead id="historyTableHead">
+                                            <th width="300">Name</th>
+                                            <th width="100">Type</th>
+                                            <th width="400">Value</th>
+                                            <th width="100">Date</th>
+                                            <th width="100">Result</th>
+                                        </thead>
+                                        <tbody id="historyTable">
+                                        {% for record in history %}
+                                            <tr>
+                                            <td>{{record.name}}</td>
+                                             <td>{{record.type}}</td>
+                                             <td>{{record.value}}</td>
+                                             <td>{{record.dateTime|date('d M y , g:i A')}}</td>
+                                             <td>{% if record.result == 1 %} Success {% endif %}
+                                             {% if record.result == 2 or record.result == '' %}
+                                             Failure {% endif %}
+                                             </td> 
+                                            </tr>
+                                        {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

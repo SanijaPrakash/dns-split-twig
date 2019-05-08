@@ -1,0 +1,160 @@
+{% extends "main.html.twig" %}
+{% block body %}
+    <section class="main-body">
+        <form id="list" name="list" method="post" action="{{ path('home') }}">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-12 pt-4">
+                        <h2 class="font-16 pro-display-heavy mb-0 head-title">
+                            DNS Check
+                            <a class="btn btn-success float-right font-14 pro-display-semibold" href="createdns">Create new
+                                <i class="fas fa-plus pl-2"></i>
+                            </a>
+                        </h2>
+                    </div>
+                </div>
+            </div>
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="pt-4">
+                            <div class="tbl-header border-bottom-0">
+                                <table cellpadding="0" class="table dns-check mb-0" width="100%">
+                                    <thead>
+                                        <th width="100">Sl No.</th>
+                                        <th width="500">Name</th>
+                                        <th>Total Record</th>
+                                        <th width="120">Actions</th>
+                                    </thead>
+                                </table>
+                            </div>
+                            <div class="h-list">
+                                <div class="tbl-content border-top-0">
+                                    <table cellpadding="0" class="table dns-check mb-0" width="100%">
+                                        <tbody>
+                                            {% set Sl = 0 %}
+                                            {% for results in result %}
+                                                <tr>
+                                                    {% set Sl = Sl+1 %}
+                                                    <td class="pro-display-bold" width="100">{{ Sl }}
+                                                    </td>
+                                                    <td width="500">
+                                                        <p class="pro-display-bold m-0">
+                                                            <a style="color:black" href="{{ path('home', {'grpId': results.id}) }} ">{{ results.name }}
+                                                            </a>
+                                                        </p>
+                                                        <span>Created :
+                                                            {{results.datecreated|date('d M y')}}
+                                                            ,
+                                                            <span>{{results.datecreated|date('g:i A')}}
+                                                            </span>
+                                                        </span>
+                                                        {% if verificationStatus[results.id] is defined %}
+                                                            {% set status = verificationStatus[results.id] %}
+                                                        {% else %}
+                                                            {% set status = false %}
+                                                        {% endif %}
+                                                        <span class="label left_pad_lbl {{ status ?'green-label' :  'red-label' }} border-0 white-co ml-3" style="{{ status ? 'color:green' :'color:red' }}">
+                                                            <i class="{{ status ? 'fas fa-check' : 'fas fa-ban' }}"></i>
+                                                        </span>
+                                                    </td>
+                                                    {% set f = 0 %}
+                                                    {% for r in res %}
+                                                        {% if (r.dnsGroupId == results.id) %}
+                                                            {% set f = 1 %}
+                                                            <td class="pro-display-bold">{{r.count}}</td>
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                    {% if ( f == 0 ) %}
+                                                        <td class="pro-display-bold">0</td>
+                                                    {% endif %}
+
+                                                    <td width="120">
+                                                        <div class="dropdown">
+                                                            <button aria-expanded="false" aria-haspopup="true" class="btn action-btn dropdown-toggle" data-toggle="dropdown" id="dropdownMenuButton" type="button">
+                                                                Actions
+                                                            </button>
+                                                            <div aria-labelledby="dropdownMenuButton" class="dropdown-menu action-drop p-0">
+                                                                <a class="dropdown-item" href="{{ path('editdns', {'grpId': results.id}) }} ">
+                                                                    <i class="fas fa-pen-square pr-2"></i>
+                                                                    Edit</a>
+                                                                <a class="dropdown-item border-0" data-toggle="modal" href="#exampleModalCenter " onclick="deleteId({{results.id}})">
+                                                                    <i class="fas fa-trash-alt pr-2"></i>
+                                                                    Delete</a>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="container pt-4">
+                <div class="row">
+                    <div class="col-md-12">
+                        <nav aria-label="Page navigation example">
+                            <ul class="pagination check-pagination mb-0">
+                                <li class="page-item">
+                                    {{ knp_pagination_render(result) }}
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </section>
+    <div class="delete-dns">
+        <div aria-hidden="true" aria-labelledby="exampleModalCenterTitle" class="modal fade" id="exampleModalCenter" role="dialog" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-body text-center">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <h2 class="pro-display-semibold font-18 pt-3">Are you sure?</h2>
+                        <p class="mb-0 font-13">Do you really want to delete these record ?
+                        </p>
+                    </div>
+                    <div class="modal-footer border-0">
+                        <button class="btn  btn-default btn-lg font-13 pro-display-semibold" data-dismiss="modal" type="button">Cancel</button>
+                        <button class="btn btn-danger btn-lg font-13" name="deleterecordbtn" type="button">
+                            <a href="javascript:void(0)" onclick="deleteGroup(idDel)" style="color: #FEFEFE">Delete</a>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block javascript %}
+    {{ parent() }}
+    <script>
+        var usr = '{{loggedinuser}}';
+        var idDel = 0;
+        function deleteId(id) {
+            idDel = id;
+        }
+        function deleteGroup(id) {
+
+            $.ajax({
+                type: "POST",
+                url: "{{ path('deleteGroup') }}",
+                data: {
+                    id: id
+                },
+                dataType: 'json'
+            }).done(function (response) {
+                console.log(response);
+                if (response['status'] == 'success') {
+                    location.reload(true);
+                }
+            }).fail(function () {
+                console.log("error");
+            })
+        }
+    </script>
+{% endblock %}

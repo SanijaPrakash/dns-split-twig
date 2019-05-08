@@ -1,0 +1,383 @@
+{% extends "main.html.twig" %}
+{% block body %}
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12 pt-5">
+                <div class="modal-header pl-0 border-0">
+                    <h5 class="modal-title pro-display-bold line-height-1 ">Details of
+                        <span id="grpViewName">
+                            {{ grpName }}</span>
+                        <br/>
+                        <span class="font-12 date-time pro-display-regular" id="viewDateCreated">Created :{{ createdDate|date('d M y , g:i A') }}
+                        </span>
+                    </h5>
+                    <div id="recordCount">Success Records :
+                        <span id="success" style="color:green">{{ successCount }}</span>
+                        and Failed Records :
+                        <span id="failure" style="color:red">{{ failureCount }}
+                        </span>
+                    </div>
+                </div>
+                <div class="alert alert-dismissible alert-danger alert-notify animated fadeInDown" id="message" style="display:none !important">
+                    <span style="color:red"></span>
+                </div>
+                <div class="modal-body pl-0 pt-0 modal-scroll">
+                    {% if dnsRecord['A'] is defined %}
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="remove-col">
+                                    <h2 class="font-14 m-0">A Record
+                                        <span class="label-check label-verified"></span>
+
+                                    </h2>
+                                </div>
+                                <div class="pt-2 section1">
+                                    <table cellpadding="0" class="table edit-dns-table" width="100%">
+                                        <thead>
+
+                                            <th width="300">Domain Name</th>
+                                            <th>IP Address</th>
+                                            <th width="100"></th>
+                                        </thead>
+                                        <tbody id="aRecordViewTable">
+                                            {% for record in dnsRecord['A'] %}
+                                                {% set tick = false %}
+                                                {% set ban = false %}
+                                                {% if record.result == 2 or record.result == '' %}
+                                                    {% set ban = true %}
+                                                {% endif %}
+                                                {% if record.result == 1  %}
+                                                    {% set tick = true %}
+                                                {% endif %}
+                                                <tr>
+                                                    <td class="verify-td">{{ record.name }}</td>
+                                                    <td class="br-0"> <span id="checkA" class="label {% if tick %} green-label {% endif %} {% if ban %} red-label {% endif %} border-0 white-co ml-3" {% if tick %} style="color:green" {% endif %} {% if ban %} style="color:red" {% endif %}>
+                                                            {% if ban %}
+                                                                <i class="fas fa-ban"></i>
+                                                            {% endif %}
+                                                            {% if tick %}
+                                                                <i class="fas fa-check"></i>
+                                                            {% endif %}
+                                                        </span>{{ record.value }}
+                                                       
+                                                    </td>
+                                                    <td>
+                                                        <div class="dropdown">
+                                                            <button aria-expanded="false" aria-haspopup="true" class="btn action-btn dropdown-toggle" data-toggle="dropdown" id="dropdownMenuButton" type="button">
+                                                                Actions
+                                                            </button>
+                                                            <div aria-labelledby="dropdownMenuButton" class="dropdown-menu action-drop p-0">
+                                                                <a class="dropdown-item" href="javascript:void(0)" onclick="recheckRecord({{record.id}},'A',{{record.dnsGroupId}})">
+                                                                    <i class="fas fa-sync-alt pr-2"></i>
+                                                                </i>
+                                                                Recheck
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+                {% if dnsRecord['MX'] is defined %}
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="remove-col">
+                                <h2 class="font-14 m-0">MX Records
+                                    <span class="label-check label-verified"></span>
+
+                                </h2>
+                            </div>
+                            <div class="pt-2 section2">
+                                <table cellpadding="0" class="table edit-dns-table" width="100%">
+                                    <thead>
+
+                                        <th width="300">Domain Name</th>
+                                        <th>TTL</th>
+                                        <th>Exchange</th>
+                                        <th width="100"></th>
+                                    </thead>
+                                    <tbody id="mxRecordViewTable">
+                                        {% for record in dnsRecord['MX'] %}
+                                            {% set tick = false %}
+                                            {% set ban = false %}
+                                            {% if record.result == 2 or record.result == '' %}
+                                                {% set ban = true %}
+                                            {% endif %}
+                                            {% if record.result == 1  %}
+                                                {% set tick = true %}
+                                            {% endif %}
+                                            <td class="verify-td">{{record.name}}</td>
+                                            <td>{{record.ttl}}</td>
+                                            <td class="br-0"> <span id="checkMX" class="label {% if tick %} green-label {% endif %} {% if ban %} red-label {% endif %} border-0 white-co ml-3" {% if tick %} style="color:green" {% endif %} {% if ban %} style="color:red" {% endif %}>
+                                                    {% if ban %}
+                                                        <i class="fas fa-ban"></i>
+                                                    {% endif %}
+                                                    {% if tick %}
+                                                        <i class="fas fa-check"></i>
+                                                    {% endif %}
+                                                </span>{{record.value}}
+                                               
+                                            </td>
+                                            <td>
+                                                <div class="dropdown">
+                                                    <button aria-expanded="false" aria-haspopup="true" class="btn action-btn dropdown-toggle" data-toggle="dropdown" id="dropdownMenuButton" type="button">
+                                                        Actions
+                                                    </button>
+                                                    <div aria-labelledby="dropdownMenuButton" class="dropdown-menu action-drop p-0">
+                                                        <a class="dropdown-item" href="javascript:void(0)" onclick="recheckRecord({{record.id}},'MX',{{record.dnsGroupId}})">
+                                                            <i class="fas fa-sync-alt pr-2"></i>
+                                                        </i>
+                                                        Recheck
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+        {% if dnsRecord['TXT'] is defined %}
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="remove-col">
+                        <h2 class="font-14 m-0">TXT Records
+
+                        </h2>
+                    </div>
+                    <div class="pt-2 section3">
+                        <table cellpadding="0" class="table edit-dns-table" width="100%">
+                            <thead>
+
+                                <th width="300">Domain Name</th>
+                                <th>IP Address</th>
+                                <th width="100"></th>
+                            </thead>
+                            <tbody id="txtRecordViewTable">
+                                {% for record in dnsRecord['TXT'] %}
+                                    {% set tick = false %}
+                                    {% set ban = false %}
+                                    {% if record.result == 2 or record.result == '' %}
+                                        {% set ban = true %}
+                                    {% endif %}
+                                    {% if record.result == 1  %}
+                                        {% set tick = true %}
+                                    {% endif %}
+                                    <tr>
+                                        <td>
+                                            {{ record.name }}
+                                        </td>
+                                        <td class="br-0 truncate"><span id="checkTXT" class="label {% if tick %} green-label {% endif %} {% if ban %} red-label {% endif %} border-0 white-co ml-3" {% if tick %} style="color:green" {% endif %} {% if ban %} style="color:red" {% endif %}>
+                                                {% if ban %}
+                                                    <i class="fas fa-ban"></i>
+                                                {% endif %}
+                                                {% if tick %}
+                                                    <i class="fas fa-check"></i>
+                                                {% endif %}
+                                            </span>{{ record.value }}
+                                            
+                                        </td>
+                                        <td>
+                                            <div class="dropdown">
+                                                <button aria-expanded="false" aria-haspopup="true" class="btn action-btn dropdown-toggle" data-toggle="dropdown" id="dropdownMenuButton" type="button">
+                                                    Actions
+                                                </button>
+                                                <div aria-labelledby="dropdownMenuButton" class="dropdown-menu action-drop p-0">
+                                                    <a class="dropdown-item" href="javascript:void(0)" onclick="recheckRecord({{record.id}},'TXT',{{record.dnsGroupId}})">
+                                                        <i class="fas fa-sync-alt pr-2"></i>
+                                                    </i>
+                                                    Recheck
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+    {% if dnsRecord['PTR'] is defined %}
+        <div class="row">
+            <div class="col-md-12">
+                <div class="remove-col">
+                    <h2 class="font-14 m-0">Reverse DNS ( PTR ) Record
+                        <span class="label-check label-n-verified"></span>
+                    </h2>
+                </div>
+                <div class="pt-2 section4">
+                    <table cellpadding="0" class="table edit-dns-table" width="100%">
+                        <thead>
+
+                            <th width="300">IP Address</th>
+                            <th>Value</th>
+                            <th width="100"></th>
+                        </thead>
+                        <tbody id="ptrRecordViewTable">
+                            {% for record in dnsRecord['PTR'] %}
+                                {% set tick = false %}
+                                {% set ban = false %}
+                                {% if record.result == 2 or record.result == '' %}
+                                    {% set ban = true %}
+                                {% endif %}
+                                {% if record.result == 1  %}
+                                    {% set tick = true %}
+                                {% endif %}
+                                <tr>
+                                    <td class="not-verified">{{record.name}}</td>
+                                    <td class="br-0"><span id="checkPTR" class="label {% if tick %} green-label {% endif %} {% if ban %} red-label {% endif %} border-0 white-co ml-3" {% if tick %} style="color:green" {% endif %} {% if ban %} style="color:red" {% endif %}>
+                                            {% if ban %}
+                                                <i class="fas fa-ban"></i>
+                                            {% endif %}
+                                            {% if tick %}
+                                                <i class="fas fa-check"></i>
+                                            {% endif %}
+                                        </span>{{record.value}}
+                                        
+                                    </td>
+                                    <td>
+                                        <div class="dropdown">
+                                            <button aria-expanded="false" aria-haspopup="true" class="btn action-btn dropdown-toggle" data-toggle="dropdown" id="dropdownMenuButton" type="button">
+                                                Actions
+                                            </button>
+                                            <div aria-labelledby="dropdownMenuButton" class="dropdown-menu action-drop p-0">
+                                                <a class="dropdown-item" href="javascript:void(0)" onclick="recheckRecord({{record.id}},'PTR',{{record.dnsGroupId}})">
+                                                    <i class="fas fa-sync-alt pr-2"></i>
+                                                </i>
+                                                Recheck
+                                            </a>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endif %}
+{% if dnsRecord['CNAME'] is defined %}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="remove-col">
+                <h2 class="font-14 m-0">CNAME Record
+
+                </h2>
+            </div>
+            <div class="pt-2 section5">
+                <table cellpadding="0" class="table edit-dns-table" width="100%">
+                    <thead>
+
+                        <th width="300">Domain Name</th>
+                        <th>TTL</th>
+                        <th>Exchange</th>
+                        <th width="100"></th>
+                    </thead>
+                    <tbody id="cnameRecordViewTable">
+                        {% for record in dnsRecord['CNAME'] %}
+                            {% set tick = false %}
+                            {% set ban = false %}
+                            {% if record.result == 2 or record.result == '' %}
+                                {% set ban = true %}
+                            {% endif %}
+                            {% if record.result == 1  %}
+                                {% set tick = true %}
+                            {% endif %}
+                            <tr>
+                                <td class="verify-td">{{record.name}}</td>
+                                <td>{{record.ttl}}</td>
+                                <td class="br-0"><span id="checkCNAME" class="label {% if tick %} green-label {% endif %} {% if ban %} red-label {% endif %} border-0 white-co ml-3" {% if tick %} style="color:green" {% endif %} {% if ban %} style="color:red" {% endif %}>
+                                        {% if ban %}
+                                            <i class="fas fa-ban"></i>
+                                        {% endif %}
+                                        {% if tick %}
+                                            <i class="fas fa-check"></i>
+                                        {% endif %}
+                                    </span>{{record.value}}
+                                    
+                                </td>
+                                <td>
+                                    <div class="dropdown">
+                                        <button aria-expanded="false" aria-haspopup="true" class="btn action-btn dropdown-toggle" data-toggle="dropdown" type="button">
+                                            Actions
+                                        </button>
+                                        <div aria-labelledby="dropdownMenuButton" class="dropdown-menu action-drop p-0">
+                                            <a class="dropdown-item" href="javascript:void(0)" onclick="recheckRecord({{record.id}},'CNAME',{{record.dnsGroupId}})">
+                                                <i class="fas fa-sync-alt pr-2"></i>
+                                            </i>
+                                            Recheck
+                                        </a>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>{% endif %}</div></div></div></div>{% endblock %}{% block javascript %}{{ parent() }}<script>function recheckRecord(id, type, dnsGrpId) {
+    $.ajax({
+        type: "POST",
+        url: "{{ path('recheckRecord') }}",
+        data: {
+            id: id,
+            type: type,
+            dnsGrpId: dnsGrpId,
+            notification: ''
+        },
+        dataType: 'json'
+    }).done(function (response) {
+        console.log(response);
+        var ele = $('#check' + type)
+        ele.removeClass("green-label red-label");
+        if (response.check) {
+            ele.addClass("green-label");
+            ele.css('color', 'green');
+            ele.html('<i class="fas fa-check"></i>');
+
+        } else {
+            ele.addClass("red-label");
+            ele.css('color', 'red');
+            ele.html('<i class="fas fa-ban"></i>');
+        }
+        var msg = document.getElementById('message');
+        msg.style.fontWeight = "900";
+        var alert = $('#message')
+        alert.removeClass("alert-danger alert-info alert-success");
+        if (response['status'] == 'verified') {
+            msg.style.display = "block";
+            alert.addClass("alert-success");
+            msg.style.display = "block";
+            msg.style.color = '#ffffff';
+            if (response['email'] == 'sent') {
+                $('#message').text(type + ' Record check Success  :  Record Match and Email sent successfully');
+            } else {
+                $('#message').text(type + ' Record check Success  :  Record Match');
+            }
+        } else if (response['status'] == 'not verified') {
+            msg.style.display = "block";
+            alert.addClass("alert-info");
+            $('#message').text(type + ' Record check Success  :  Record Mismatch');
+            msg.style.color = '#ffffff';
+        } else {
+            msg.style.display = "block";
+            alert.addClass("alert-danger");
+            $('#message').text(type + ' Record check Failed');
+            msg.style.color = '#ffffff';
+        }
+    }).fail(function (error) {
+        console.log(error);
+    })
+}</script>{% endblock %}

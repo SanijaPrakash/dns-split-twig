@@ -1,0 +1,83 @@
+{% extends "main.html.twig" %}
+{% block body %}
+    <form action="{{ path('insertdns') }}" method="post" name="createdns">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-8 mx-auto pt-5">
+                    <div class="modal-header pl-0">
+                        <h5 class="modal-title pro-display-heavy" id="exampleModalLabel">Create DNS Record Group</h5>
+                    </div>
+                    <span id="alertDnsGroup" style="color:red"></span>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-12 pb-2">
+                                <label>Name</label>
+                                <input class="form-control" id="name" name="name" placeholder="" type="text">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12 pb-2">
+                                <label>Description</label>
+                                <textarea class="form-control h-auto" id="description" name="description" rows="3"></textarea>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12 pb-4 pt-3">
+                                <label class="pb-1">Make public Visible</label>
+                                <label class="radio-div">On
+                                    <input checked="checked" name="privacy" type="radio" value="1">
+                                    <span class="checkmark"></span>
+                                </label>
+                                <label class="radio-div ml-4">Off
+                                    <input name="privacy" type="radio" value="0">
+                                    <span class="checkmark"></span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12 pb-2">
+                                <label class="pb-1">Notifications</label>
+                                <label class="radio-div">On
+                                    <input checked="checked" name="notification" type="radio" value="1">
+                                    <span class="checkmark"></span>
+                                </label>
+                                <label class="radio-div ml-4">Off
+                                    <input name="notification" type="radio" value="0">
+                                    <span class="checkmark"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-8 mx-auto">
+                    <button class="btn btn-success btn-lg font-16 pro-display-heavy success-save mr-2" name="save" onclick="return alphanumeric()" type="submit">Save</button>
+                    <a class="btn  btn-default btn-lg font-16 pro-display-heavy" name="cancel" href="home" >Cancel</a>
+                </div>
+            </div>
+        </div>
+    </form> 
+{% endblock %} 
+{% block javascript %}
+{{ parent() }}
+<script>
+    function alphanumeric()
+{ 
+   var x = document.forms["createdns"]["name"].value;  
+    var letters = /^[a-zA-Z0-9 ]+$/i;
+    if((letters.test(x))&&(x!=''))
+    { 
+        return true;
+    }
+    else
+    {
+        msg="Please input alphanumeric characters ";
+        $('#alertDnsGroup').text(msg); 
+        return false;
+    }
+}
+</script>
+{% endblock %}

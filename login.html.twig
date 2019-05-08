@@ -1,0 +1,71 @@
+{% extends 'main.html.twig' %}
+{% block body %}
+    <section class="section-login">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-lg-5 col-sm-8 bg-white">
+                    <div class="row h100vh align-items-center">
+                        <div class="col-lg-8 col-sm-10 mx-auto">
+                            <div class="mx-width mx-auto">
+                                <div class="pb-2">
+                                    <img alt="" height="32" src="images/dns-logo.jpg" width="72">
+                                    <h2 class="font-18 pro-display-semibold login-head mb-0 pt-5">Good to See You Again!</h2>
+                                    <p class="font-16 mt-1 login-nw">Login now</p>
+                                </div>
+                                <form name="form" method="post" class="needs-validation validate-form" novalidate action="{{ path('login') }}">
+                                    {% if error %}
+                                        <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+                                    {% endif %}
+                                    <div class="form-row form-login" id="login">
+                                        <div class="col-md-12 mb-3" id="login_username">
+                                            <label class="font-14" for="validationCustom01">Name</label>
+                                            <input type="email" name="_username" class="form-control" id="validationCustom01" placeholder="" required value={{lastUsername}}>
+                                            <div class="invalid-feedback" id="username">
+                                                <span>
+                                                    <i class="fas fa-exclamation-circle pr-2"></i>
+                                                </span>
+                                                Enter Valid Username
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-row form-login">
+                                        <div class="col-md-12 mb-3">
+                                            <label class="font-14" for="validationCustom02">Password</label>
+                                            <span class="float-right">
+                                                <a class="text-muted" href="#">
+                                                    <i class="fas fa-eye font-13 login-nw" onclick="show()"></i>
+                                                </a>
+                                            </span>
+                                            <input class="form-control" id="password" name="password" placeholder="" required type="password">
+                                            <div class="invalid-feedback" id="login_password">
+                                                <span>
+                                                    <i class="fas fa-exclamation-circle pr-2"></i>
+                                                </span>
+                                                Enter Password
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+                                    <button class="btn login-btn btn-block pro-display-heavy mt-4 mb-4" type="submit">Login</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+{% endblock %}
+{% block javascript %}
+    <script>
+        function show() {
+            var x = document.getElementById("password");
+            if (x.type === "password") {
+                x.type = "text";
+            } else {
+                x.type = "password";
+            }
+        }
+    </script>
+{% endblock %}

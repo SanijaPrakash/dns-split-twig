@@ -1,0 +1,358 @@
+{% set tick = false %}
+{% set ban = false %}
+<div class="row pb-3">
+    <div class="col-md-12">
+        <div class="remove-col">
+            <h2 class="font-14 m-0">A Record
+            </h2>
+        </div>
+        <div class="pt-2 section1">
+            <form id="formEditA" method="post" name="formEditA">
+                <table cellpadding="0" class="table edit-dns-table mb-2" id='ARecordEditTable' width="100%">
+                    <thead>
+                        <th width="40"></th>
+                        <th width="300">Domain Name</th>
+                        <th>IP Address</th>
+                        <th width="100"></th>
+                    </thead>
+                    <tbody>
+                        {% if dnsRecord['A'] is defined %}
+                            {% for record in dnsRecord['A'] %}
+                                {% set tick = false %}
+                                {% set ban = false %}
+                                {% if record.result == 2 or record.result == '' %}
+                                    {% set ban = true %}
+                                {% endif %}
+                                {% if record.result == 1  %}
+                                    {% set tick = true %}
+                                {% endif %}
+                                <tr id='A{{record.id}}'>
+                                    <td>
+                                        <label class="check-div">
+                                            <input onclick="deleteRecordEntry(event, 'A')" value='{{record.id}}' type="checkbox">
+                                            <input id='{{record.id}}' type="hidden" value='{{record.id}}'>
+                                            <span class="check-m"></span>
+                                        </label>
+                                    </td>
+                                    <td class="add-name"><input onchange="recordChanged(event,{{record.id}},'name')" id='{{record.id}}Name' class="form-control" placeholder=".." type="text" value='{{record.name}}'></td>
+                                    <td class="br-0 left-pad-wth">
+                                        <span id="checkA{{record.id}}" class="label left_pad_lbl {% if tick %} green-label {% endif %} {% if ban %} red-label {% endif %} border-0 white-co ml-3" {% if tick %} style="color:green" {% endif %} {% if ban %} style="color:red" {% endif %}>
+                                        {% if ban %} <i class="fas fa-ban"></i> {% endif %}
+                                        {% if tick %} <i class="fas fa-check"></i> {% endif %}
+                                        </span>
+                                        <input onchange="recordChanged(event,{{record.id}},'value')" id="{{record.id}}Value" class="form-control" placeholder=".." type="text" value="{{record.value}}">
+                                    </td>
+                                    <td>
+                                        <div class="dropdown">
+                                            <button aria-expanded="false" aria-haspopup="true" class="btn action-btn dropdown-toggle" data-toggle="dropdown" id="dropdownMenuButton" type="button">Actions
+                                            </button>
+                                            <div aria-labelledby="dropdownMenuButton" class="dropdown-menu action-drop p-0">
+                                                <a class="dropdown-item" href="javascript:void(0)" onclick="recheckRecord({{record.id}},'A','edit')">
+                                                    <i class="fas fa-sync-alt pr-2"></i>
+                                                </i>
+                                                Recheck </a>
+                                                <a class="dropdown-item" href="{{ path('recordHistory', {'recId': record.id}) }} ">
+                                                <i class="fas fa-history pr-2"></i>
+                                                History</a>
+                                                <a class="dropdown-item border-0" href="javascript:void(0)" onclick="deleteRecord({{record.id}},'A')">
+                                                <i class="fas fa-trash-alt pr-2"></i>
+                                                Delete</a>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                {% endif %}
+            </table>
+        </form>
+    </div>
+    <a class="btn btn-success float-right font-14 pro-display-semibold" href="javascript:void(0)" id="A_new" onclick="addNew('formEditA','A','false')">Add New Record
+        <i class="fas fa-plus pl-2"></i>
+    </a>
+    <a class="btn btn-danger float-right font-14 pro-display-semibold" href="javascript:void(0)" id="A_delete" onclick="deleteChecked('formEditA')" style="display:none;">Delete
+        <i class="fas fa-trash-alt pl-2"></i>
+    </a>
+    <a class="btn btn-primary float-right font-14 pro-display-semibold" href="javascript:void(0)" id="A_save" onclick="saveNew('A')" style="display:none;">Save
+        <i class="fas fa-save pl-2"></i>
+    </a>
+</div></div><div class="row pb-3">
+<div class="col-md-12">
+    <div class="remove-col">
+        <h2 class="font-14 m-0">TXT Records
+        </h2>
+    </div>
+    <div class="pt-2 section3">
+        <form id="formEditTXT" method="post" name="formEditTXT">
+            <table cellpadding="0" class="table edit-dns-table mb-2" id='TXTRecordEditTable' width="100%">
+                <thead>
+                    <th width="40"></th>
+                    <th width="300">Domain Name</th>
+                    <th>Value</th>
+                    <th width="100"></th>
+                </thead>
+                {% if dnsRecord['TXT'] is defined %}
+                    <tbody>
+
+                        {% for record in dnsRecord['TXT'] %}
+                            {% set tick = false %}
+                            {% set ban = false %}
+                            {% if record.result == 2 or record.result == ''  %}
+                                {% set ban = true %}
+                            {% endif %}
+                            {% if record.result == 1  %}
+                                {% set tick = true %}
+                            {% endif %}
+                            <tr id='TXT{{record.id}}'>
+                                <td>
+                                    <label class="check-div">
+                                        <input onclick="deleteRecordEntry(event, 'TXT')" value='{{record.id}}' type="checkbox">
+                                        <input id='{{record.id}}' type="hidden" value='{{record.id}}'>
+                                        <span class="check-m"></span>
+                                    </label>
+                                </td>
+                                <td class="add-name"><input onchange="recordChanged(event,{{record.id}},'name')" id='{{record.id}}Name' class="form-control" placeholder=".." type="text" value='{{record.name}}'></td>
+                                <td class="br-0 left-pad-wth">
+                                    <span id="checkTXT{{record.id}}" class="label left_pad_lbl {% if tick %} green-label {% endif %} {% if ban %} red-label {% endif %} border-0 white-co ml-3" {% if tick %} style="color:green" {% endif %} {% if ban %} style="color:red" {% endif %}>
+                                        {% if ban %}
+                                            <i class="fas fa-ban"></i>
+                                        {% endif %}
+                                        {% if tick %}
+                                            <i class="fas fa-check"></i>
+                                        {% endif %}
+                                    </span><input onchange="recordChanged(event,{{record.id}},'value')" id="{{record.id}}Value" class="form-control" placeholder=".." type="text" value="{{record.value}}"></td>
+                                <td>
+                                    <div class="dropdown">
+                                        <button aria-expanded="false" aria-haspopup="true" class="btn action-btn dropdown-toggle" data-toggle="dropdown" id="dropdownMenuButton" type="button">Actions
+                                        </button>
+                                        <div aria-labelledby="dropdownMenuButton" class="dropdown-menu action-drop p-0">
+                                            <a class="dropdown-item" href="javascript:void(0)" onclick="recheckRecord({{record.id}},'TXT','edit')">
+                                                <i class="fas fa-sync-alt pr-2"></i>
+                                            </i>
+                                            Recheck
+                                        </a>
+                                        <a class="dropdown-item" href="{{ path('recordHistory', {'recId': record.id}) }} ">
+                                            <i class="fas fa-history pr-2"></i>
+                                            History</a>
+                                        <a class="dropdown-item border-0" href="javascript:void(0)" onclick="deleteRecord({{record.id}})">
+                                            <i class="fas fa-trash-alt pr-2"></i>
+                                            Delete</a>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            {% endif %}
+        </table>
+    </form>
+</div>
+<a class="btn btn-success float-right font-14 pro-display-semibold" href="javascript:void(0)" id="TXT_new" onclick="addNew('formEditTXT','TXT','false')">Add New Record
+    <i class="fas fa-plus pl-2"></i>
+</a>
+<a class="btn btn-danger float-right font-14 pro-display-semibold" href="javascript:void(0)" id="TXT_delete" onclick="deleteChecked('formEditTXT')" style="display:none;">Delete
+    <i class="fas fa-trash-alt pl-2"></i>
+</a>
+<a class="btn btn-primary float-right font-14 pro-display-semibold" href="javascript:void(0)" id="TXT_save" onclick="saveNew('TXT')" style="display:none;">Save
+    <i class="fas fa-save pl-2"></i>
+</a></div></div><div class="row pb-3"><div class="col-md-12">
+<div class="remove-col">
+    <h2 class="font-14 m-0">Reverse DNS ( PTR ) Record
+    </h2>
+</div>
+<div class="pt-2 section4">
+    <form id="formEditPTR" method="post" name="formEditPTR">
+        <table cellpadding="0" class="table edit-dns-table mb-2" id='PTRRecordEditTable' width="100%">
+            <thead>
+                <th width="40"></th>
+                <th width="300">IP Address</th>
+                <th>Value</th>
+            </thead>
+            {% if dnsRecord['PTR'] is defined %}
+                <tbody>
+                    {% for record in dnsRecord['PTR'] %}
+                        {% set ban = false %}
+                        {% set tick = false %}
+                        {% if record.result == 2 or record.result == '' %}
+                            {% set ban = true %}
+                        {% endif %}
+                        {% if record.result == 1  %}
+                            {% set tick = true %}
+                        {% endif %}
+                        <tr id='PTR{{record.id}}'>
+                            <td>
+                                <label class="check-div">
+                                    <input onclick="deleteRecordEntry(event, 'PTR')" value='{{record.id}}' type="checkbox">
+                                    <input id='{{record.id}}' type="hidden" value='{{record.id}}'>
+                                    <span class="check-m"></span>
+                                </label>
+                            </td>
+                            <td class="add-name"><input onchange="recordChanged(event,{{record.id}},'name')" id='{{record.id}}Name' class="form-control" placeholder=".." type="text" value='{{record.name}}'></td>
+                            <td class="br-0 left-pad-wth">
+                                <span id="checkPTR{{record.id}}" class="label left_pad_lbl {% if tick %} green-label {% endif %} {% if ban %} red-label {% endif %} border-0 white-co ml-3" {% if tick %} style="color:green" {% endif %} {% if ban %} style="color:red" {% endif %}>
+                                    {% if ban %}
+                                        <i class="fas fa-ban"></i>
+                                    {% endif %}
+                                    {% if tick %}
+                                        <i class="fas fa-check"></i>
+                                    {% endif %}
+                                </span><input onchange="recordChanged(event,{{record.id}},'value')" id="{{record.id}}Value" class="form-control" placeholder=".." type="text" value="{{record.value}}"></td>
+                            <td>
+                                <div class="dropdown">
+                                    <button aria-expanded="false" aria-haspopup="true" class="btn action-btn dropdown-toggle" data-toggle="dropdown" id="dropdownMenuButton" type="button">Actions
+                                    </button>
+                                    <div aria-labelledby="dropdownMenuButton" class="dropdown-menu action-drop p-0">
+                                        <a class="dropdown-item" href="javascript:void(0)" onclick="recheckRecord({{record.id}},'PTR','edit')">
+                                            <i class="fas fa-sync-alt pr-2"></i>
+                                        </i>
+                                        Recheck
+                                    </a>
+                                    <a class="dropdown-item" href="{{ path('recordHistory', {'recId': record.id}) }} ">
+                                        <i class="fas fa-history pr-2"></i>
+                                        History</a>
+                                    <a class="dropdown-item border-0" href="javascript:void(0)" onclick="deleteRecord({{record.id}})">
+                                        <i class="fas fa-trash-alt pr-2"></i>
+                                        Delete</a>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        {% endif %}
+    </table>
+</form></div><a class="btn btn-success float-right font-14 pro-display-semibold" href="javascript:void(0)" id="PTR_new" onclick="addNew('formEditPTR','PTR','false')">Add New Record
+<i class="fas fa-plus pl-2"></i></a><a class="btn btn-danger float-right font-14 pro-display-semibold" href="javascript:void(0)" id="PTR_delete" onclick="deleteChecked('formEditPTR')" style="display:none;">Delete
+<i class="fas fa-trash-alt pl-2"></i></a><a class="btn btn-primary float-right font-14 pro-display-semibold" href="javascript:void(0)" id="PTR_save" onclick="saveNew('PTR')" style="display:none;">Save
+<i class="fas fa-save pl-2"></i></a></div></div><div class="row pb-3"><div class="col-md-12"><div class="remove-col">
+<h2 class="font-14 m-0">MX Records
+</h2></div><div class="pt-2 section2">
+<form id="formEditMX" method="post" name="formEditMX">
+    <table cellpadding="0" class="table edit-dns-table mb-2" id='MXRecordEditTable' width="100%">
+        <thead>
+            <th width="40"></th>
+            <th width="300">Domain Name</th>
+            <th>TTL</th>
+            <th>Exchange</th>
+            <th width="100"></th>
+        </thead>
+        {% if dnsRecord['MX'] is defined %}
+            <tbody>
+                {% for record in dnsRecord['MX'] %}
+                    {% set ban = false %}
+                    {% set tick = false %}
+                    {% if record.result == 2 or record.result == '' %}
+                        {% set ban = true %}
+                    {% endif %}
+                    {% if record.result == 1  %}
+                        {% set tick = true %}
+                    {% endif %}
+                    <tr id='MX{{record.id}}'>
+                        <td>
+                            <label class="check-div">
+                                <input value='{{record.id}}' type="checkbox" onclick="deleteRecordEntry(event,'MX' )">
+                                <input type="hidden" value="{{record.id}}">
+                                <span class="check-m"></span>
+                            </label>
+                        </td>
+                        <td><input onchange="recordChanged(event,{{record.id}},'name')" required type="text" id='MX{{record.id}}Name' class="form-control" placeholder="" value="{{record.name}}"></td>
+                        <td><input required type="text" onchange="recordChanged(event,'{{record.id}}','ttl')" id='MX{{record.id}}ttl' class="form-control" placeholder=".." value="{{record.ttl}}"></td>
+                        <td class="br-0 left-pad-wth">
+                            <span id="checkMX{{record.id}}" class="label left_pad_lbl {% if tick %} green-label {% endif %} {% if ban %} red-label {% endif %} border-0 white-co ml-3" {% if tick %} style="color:green" {% endif %} {% if ban %} style="color:red" {% endif %}>
+                                {% if ban %}
+                                    <i class="fas fa-ban"></i>
+                                {% endif %}
+                                {% if tick %}
+                                    <i class="fas fa-check"></i>
+                                {% endif %}
+                            </span><input onchange="recordChanged(event,{{record.id}},'value')" required id='MX{{record.id}}Value' type="text" class="form-control" placeholder=".." value="{{record.value}}">
+                        </td>
+                        <td>
+                            <div class="dropdown">
+                                <button aria-expanded="false" aria-haspopup="true" class="btn action-btn dropdown-toggle" data-toggle="dropdown" id="dropdownMenuButton" type="button">
+                                    Actions
+                                </button>
+                                <div aria-labelledby="dropdownMenuButton" class="dropdown-menu action-drop p-0">
+                                    <a class="dropdown-item" href="javascript:void(0)" onclick="recheckRecord({{record.id}},'MX','edit')">
+                                        <i class="fas fa-sync-alt pr-2"></i>
+                                    </i>
+                                    Recheck
+                                </a>
+                                <a class="dropdown-item" href="{{ path('recordHistory', {'recId': record.id}) }} ">
+                                    <i class="fas fa-history pr-2"></i>
+                                    History
+                                </a>
+                                <a class="dropdown-item border-0" href="javascript:void(0)" onclick="deleteRecord({{record.id}},'MX')">
+                                    <i class="fas fa-trash-alt pr-2"></i>
+                                    Delete</a>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    {% endif %}
+</table></form></div><a class="btn btn-success float-right font-14 pro-display-semibold" href="javascript:void(0)" id="MX_new" onclick="addNew('formEditMX','MX','false')">Add New Record<i class="fas fa-plus pl-2"></i></a><a class="btn btn-danger float-right font-14 pro-display-semibold" href="javascript:void(0)" id="MX_delete" onclick="deleteChecked('formEditMX')" style="display:none;">Delete<i class="fas fa-trash-alt pl-2"></i></a><a class="btn btn-primary float-right font-14 pro-display-semibold" href="javascript:void(0)" id="MX_save" onclick="saveNew('MX')" style="display:none;">Save<i class="fas fa-save pl-2"></i></a></div></div><div class="row pb-3"><div class="col-md-12"><div class="remove-col"><h2 class="font-14 m-0">CNAME Record</h2></div><div class="pt-2 section5"><form id="formEditCname" method="post" name="formEditCname">
+<table cellpadding="0" class="table edit-dns-table mb-2" id='CNAMERecordEditTable' width="100%">
+    <thead>
+        <th width="40"></th>
+        <th width="300">Domain Name</th>
+        <th>TTL</th>
+        <th>Exchange</th>
+        <th width="100"></th>
+    </thead>
+    {% if dnsRecord['CNAME'] is defined %}
+        <tbody>
+            {% for record in dnsRecord['CNAME'] %}
+                {% set ban = false %}
+                {% set tick = false %}
+                {% if record.result == 2 or record.result == '' %}
+                    {% set ban = true %}
+                {% endif %}
+                {% if record.result == 1  %}
+                    {% set tick = true %}
+                {% endif %}
+                <tr id='CNAME{{record.id}}'>
+                    <td>
+                        <label class="check-div">
+                            <input value='{{record.id}}' type="checkbox" onclick="deleteRecordEntry(event,'CNAME' )">
+                            <input type="hidden" value="{{record.id}}">
+                            <span class="check-m"></span>
+                        </label>
+                    </td>
+                    <td><input onchange="recordChanged(event,{{record.id}},'name')" required type="text" id='CNAME{{record.id}}Name' class="form-control" placeholder="" value="{{record.name}}"></td>
+                    <td><input required type="text" onchange="recordChanged(event,'{{record.id}}','ttl')" id='CNAME{{record.id}}ttl' class="form-control" placeholder=".." value="{{record.ttl}}"></td>
+                    <td class="br-0 left-pad-wth">
+                        <span id="checkCNAME{{record.id}}" class="label left_pad_lbl{% if tick %} green-label {% endif %} {% if ban %} red-label {% endif %} border-0 white-co ml-3" {% if tick %} style="color:green" {% endif %} {% if ban %} style="color:red" {% endif %}>
+                            {% if ban %}
+                                <i class="fas fa-ban"></i>
+                            {% endif %}
+                            {% if tick %}
+                                <i class="fas fa-check"></i>
+                            {% endif %}
+                        </span><input onchange="recordChanged(event,{{record.id}},'value')" required id='CNAME{{record.id}}Value' type="text" class="form-control" placeholder=".." value="{{record.value}}"></td>
+                    <td>
+                        <div class="dropdown">
+                            <button aria-expanded="false" aria-haspopup="true" class="btn action-btn dropdown-toggle" data-toggle="dropdown" id="dropdownMenuButton" type="button">
+                                Actions
+                            </button>
+                            <div aria-labelledby="dropdownMenuButton" class="dropdown-menu action-drop p-0">
+                                <a class="dropdown-item" href="javascript:void(0)" onclick="recheckRecord({{record.id}},'CNAME','edit')">
+                                    <i class="fas fa-sync-alt pr-2"></i>
+                                </i>
+                                Recheck
+                            </a>
+                            <a class="dropdown-item" href="{{ path('recordHistory', {'recId': record.id}) }} ">
+                                <i class="fas fa-history pr-2"></i>
+                                History
+                            </a>
+                            <a class="dropdown-item border-0" href="javascript:void(0)" onclick="deleteRecord({{record.id}})">
+                                <i class="fas fa-trash-alt pr-2"></i>
+                                Delete</a>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+{% endif %}</table></form></div><a class="btn btn-success float-right font-14 pro-display-semibold" href="javascript:void(0)" id="CNAME_new" onclick="addNew('formEditCname','CNAME','false')">Add New Record<i class="fas fa-plus pl-2"></i></a><a class="btn btn-danger float-right font-14 pro-display-semibold" href="javascript:void(0)" id="CNAME_delete" onclick="deleteChecked('formEditCname')" style="display:none;">Delete<i class="fas fa-trash-alt pl-2"></i></a><a class="btn btn-primary float-right font-14 pro-display-semibold" href="javascript:void(0)" id="CNAME_save" onclick="saveNew('CNAME')" style="display:none;">Save<i class="fas fa-save pl-2"></i></a></div></div>
